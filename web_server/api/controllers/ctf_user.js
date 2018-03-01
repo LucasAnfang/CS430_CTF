@@ -2,15 +2,19 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const CTF_User = require('../models/ctf_user')
+const CTF_User = require('../models/ctf_user');
+const BalanceSheet = require('../models/balance_sheet');
 
 exports.signup_user = (req, res, next) => {
     /*  
-        req.params.username => username
-        req.params.password => pw
+        req.query.user => username
+        req.query.pass => pw
     */
-
-    CTF_User.find({ username: req.params.username })
+    console.log('assessing registration');
+    console.log(req.query.user);
+    console.log(req.query.pass);
+    
+    CTF_User.find({ username: req.query.user })
         .exec()
         .then(user => {
             if (user.length >= 1){
@@ -18,7 +22,7 @@ exports.signup_user = (req, res, next) => {
                     message: 'Username already in use'
                 });
             } else {
-                bcrypt.hash(req.params.password, 10, (err, hash) => {
+                bcrypt.hash(req.query.pass, 10, (err, hash) => {
                     if (err) {
                         return res.status(500).json({
                             error: err
@@ -26,16 +30,33 @@ exports.signup_user = (req, res, next) => {
                     } else {
                         const user = new CTF_User({
                             _id: new mongoose.Types.ObjectId(),
-                            username: req.params.username,
+                            username: req.query.user,
                             password: hash
                         });
                         user
                             .save()
-                            .then(result => {
-                                console.log(result);
-                                res.status(201).json({
-                                    message: 'User created'
+                            .then(user_creation_result => {
+                                console.log(user_creation_result);
+                                const balanceSheet = new BalanceSheet({
+                                    _id: new mongoose.Types.ObjectId(),
+                                    _user_id: user._id,
+                                    username: user.username,
+                                    balance: 0
                                 });
+                                balanceSheet
+                                    .save()
+                                    .then(balance_sheet_creation_result => { 
+                                        console.log(balance_sheet_creation_result);
+                                        res.status(201).json({
+                                            message: 'User created with balance 0'
+                                        });
+                                    })
+                                    .catch(err => {
+                                        console.log(err);
+                                        res.status(500).json({ 
+                                            error: err 
+                                        });
+                                    });
                             })
                             .catch(err => {
                                 console.log(err);
@@ -50,12 +71,15 @@ exports.signup_user = (req, res, next) => {
 }
 
 exports.login_user = (req, res, next) => {
-    /* 
-        req.params.username => username
-        req.params.password => pw
+    /*  
+        req.query.user => username
+        req.query.pass => pw
     */
+   console.log('assessing login');
+   console.log(req.query.user);
+   console.log(req.query.pass);
 
-   CTF_User.findOne({ username: req.params.username })
+   CTF_User.findOne({ username: req.query.user })
         .exec()
         .then(user => {
             if (user === null) {
@@ -64,7 +88,7 @@ exports.login_user = (req, res, next) => {
                 });
             }
             // check if password matches
-            bcrypt.compare(req.params.password, user.password, (err, result) => {
+            bcrypt.compare(req.query.pass, user.password, (err, result) => {
                 if (err) {
                     return res.status(401).json({
                         message: 'Auth failed'

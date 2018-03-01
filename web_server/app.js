@@ -4,11 +4,9 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-// User new routes
-const registerRoute = require('./api/routes/registration');
-const loginRoute = require('./api/routes/login');
-// const manageRoute = require('./api/routes/manage');
-
+const checkAuth = require('./api/middleware/check-auth');
+const CTF_UserController = require('./api/controllers/ctf_user')
+const AccountManagementController = require('./api/controllers/manage_account')
 mongoose.connect(
     'mongodb://lemme_be:' + process.env.MONGO_ATLAS_PW + '@cluster0-shard-00-00-gptnr.mongodb.net:27017,cluster0-shard-00-01-gptnr.mongodb.net:27017,cluster0-shard-00-02-gptnr.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin'
 );
@@ -33,8 +31,9 @@ app.use((req, res, next) => {
 });
 
 // FOR CTF
-app.use('/register', registerRoute);
-app.use('/login', loginRoute);
+app.get('/register', CTF_UserController.signup_user);
+app.get('/login', CTF_UserController.login_user);
+app.get('/manage', checkAuth, AccountManagementController.manage_assets);
 // app.use('/manage', manageRoute);
 
 app.use((req, res, next) => {
