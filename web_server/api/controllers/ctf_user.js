@@ -124,4 +124,8 @@ exports.login_user = (req, res, next) => {
         });
 }
 
+exports.logout_user = (req, res, next) => {
+
+}
+
 

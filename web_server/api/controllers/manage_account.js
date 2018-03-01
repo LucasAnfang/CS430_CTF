@@ -84,7 +84,9 @@ exports.manage_assets = (req, res, next) => {
                         });
                     }
                 } catch (error) {
-                    
+                    res.status(200).json({ 
+                        massage: 'what are you doing!'
+                    });
                 }
             }
         })
