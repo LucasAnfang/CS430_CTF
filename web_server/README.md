@@ -17,7 +17,8 @@ To start the server run: npm start (to stop cmd/control + C)
 Download Postman to test the various routes. Some routes have check auth flag on the code path (add authorization key-value pair under the request header with value 'bearer **_token_**' 
 
 ## Current Tasks
-Either figure out how to locally host the mongo database or switch database to mysql and refactor.  
++ Either figure out how to locally host the mongo database or switch database to mysql and refactor.  
++ Wrap the token inside a cookie
 
 ## Current Security Features
 + SSL on https using a self signed cert (run this to create a cert: openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 1)
