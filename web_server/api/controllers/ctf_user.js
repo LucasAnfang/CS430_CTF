@@ -31,12 +31,12 @@ exports.signup_user = (req, res, next) => {
                         const user = new CTF_User({
                             _id: new mongoose.Types.ObjectId(),
                             username: req.query.user,
-                            password: hash
+                            password: hash,
+                            jwt_nonce: Math.floor(Math.random() * 50) + 10 
                         });
                         user
                             .save()
                             .then(user_creation_result => {
-                                console.log(user_creation_result);
                                 const balanceSheet = new BalanceSheet({
                                     _id: new mongoose.Types.ObjectId(),
                                     _user_id: user._id,
@@ -46,7 +46,6 @@ exports.signup_user = (req, res, next) => {
                                 balanceSheet
                                     .save()
                                     .then(balance_sheet_creation_result => { 
-                                        console.log(balance_sheet_creation_result);
                                         res.status(201).json({
                                             message: 'User created with balance 0'
                                         });
@@ -98,7 +97,8 @@ exports.login_user = (req, res, next) => {
                     const token = jwt.sign(
                         {
                             username: user.username,
-                            userId: user._id
+                            userId: user._id,
+                            nonce: user.jwt_nonce
                         }, 
                         process.env.JWT_KEY,
                         {
@@ -125,7 +125,9 @@ exports.login_user = (req, res, next) => {
 }
 
 exports.logout_user = (req, res, next) => {
-
+    return res.status(200).json({
+        message: 'Logout successful',
+    });
 }
 
 

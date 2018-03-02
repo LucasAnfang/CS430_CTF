@@ -30,11 +30,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// FOR CTF
 app.get('/register', CTF_UserController.signup_user);
 app.get('/login', CTF_UserController.login_user);
 app.get('/manage', checkAuth, AccountManagementController.manage_assets);
-// app.use('/manage', manageRoute);
+app.get('/logout', checkAuth, CTF_UserController.logout_user);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');

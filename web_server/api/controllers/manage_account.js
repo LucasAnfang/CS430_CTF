@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const CTF_User = require('../models/ctf_user');
@@ -26,68 +25,74 @@ exports.manage_assets = (req, res, next) => {
             } else {
                 try {
                     if(req.query.action === 'deposit') {
-                        console.log(balance_sheet.balance);
                         balance_sheet.balance += parseInt(req.query.amount);
-                        console.log('new balance: ', balance_sheet.balance);
                         balance_sheet
                             .save()
                             .then(result => {
-                                console.log(result);
-                                res.status(200).json({ 
-                                    balance: result.balance 
+                                return res.status(200).json({ 
+                                    balance: result.balance,
+                                    token:  req.token
                                 });
                             })
                             .catch(err => {
                                 console.log(err);
-                                res.status(500).json({ 
+                                return res.status(500).json({ 
                                     error: err 
                                 });
                             });
                     }
                     else if(req.query.action === 'withdraw') {
-                        console.log(balance_sheet.balance);
                         var amount = parseInt(req.query.amount);
                         if(balance_sheet.balance < amount) {
-                            res.status(200).json({ 
+                            return res.status(200).json({ 
                                 message: 'current balance to low for specified withdrawal',
-                                balance: balance_sheet.balance
+                                balance: balance_sheet.balance,
+                                token:  req.token
                             });
                         }
                         else 
                         {
                             balance_sheet.balance -= parseInt(req.query.amount);
-                            console.log('new balance: ', balance_sheet.balance);
                             balance_sheet
                                 .save()
                                 .then(result => {
-                                    console.log(result);
                                     res.status(200).json({ 
-                                        balance: result.balance 
+                                        balance: result.balance,
+                                        token:  req.token 
                                     });
                                 })
                                 .catch(err => {
                                     console.log(err);
-                                    res.status(500).json({ 
+                                    return res.status(500).json({ 
                                         error: err 
                                     });
                                 });
                         }
                     }
                     else if(req.query.action === 'balance') {
-                        res.status(200).json({ 
-                            balance: balance_sheet.balance
+                        return res.status(200).json({ 
+                            balance: balance_sheet.balance,
+                            token:  req.token
                         });
                     }
                     else if(req.query.action === 'close') {
-                        res.status(200).json({ 
-                            massage: 'what is this path for??'
+                        return res.status(200).json({ 
+                            massage: 'what is this path for??',
+                            token:  req.token
                         });
                     }
-                } catch (error) {
-                    res.status(200).json({ 
+                } catch (err) {
+                    console.log(err);
+                    return res.status(200).json({ 
                         massage: 'what are you doing!'
                     });
                 }
             }
         })
+        .catch(err => {
+            console.log(err);
+            return res.status(500).json({ 
+                error: err 
+            });
+        });
 }

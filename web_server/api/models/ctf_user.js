@@ -7,7 +7,8 @@ const userSchema = mongoose.Schema({
         require: true, 
         unique: true
     },
-    password: { type: String, require: true }
+    password: { type: String, require: true },
+    jwt_nonce: { type: Number, require: true }
 });
 
 module.exports = mongoose.model('CTF_User', userSchema)
