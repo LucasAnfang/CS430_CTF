@@ -23,69 +23,59 @@ exports.manage_assets = (req, res, next) => {
                     message: 'Cannot reach balance sheet'
                 });
             } else {
-                try {
-                    if(req.query.action === 'deposit') {
-                        balance_sheet.balance += parseInt(req.query.amount);
-                        balance_sheet
-                            .save()
-                            .then(result => {
-                                return res.status(200).json({ 
-                                    balance: result.balance,
-                                    token:  req.token
-                                });
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                return res.status(500).json({ 
-                                    error: err 
-                                });
-                            });
-                    }
-                    else if(req.query.action === 'withdraw') {
-                        var amount = parseInt(req.query.amount);
-                        if(balance_sheet.balance < amount) {
+                if(req.query.action === 'deposit') {
+                    balance_sheet.balance += parseInt(req.query.amount);
+                    balance_sheet
+                        .save()
+                        .then(result => {
                             return res.status(200).json({ 
-                                message: 'current balance to low for specified withdrawal',
-                                balance: balance_sheet.balance,
+                                balance: result.balance,
                                 token:  req.token
                             });
-                        }
-                        else 
-                        {
-                            balance_sheet.balance -= parseInt(req.query.amount);
-                            balance_sheet
-                                .save()
-                                .then(result => {
-                                    res.status(200).json({ 
-                                        balance: result.balance,
-                                        token:  req.token 
-                                    });
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    return res.status(500).json({ 
-                                        error: err 
-                                    });
-                                });
-                        }
-                    }
-                    else if(req.query.action === 'balance') {
+                        })
+                }
+                else if(req.query.action === 'withdraw') {
+                    var amount = parseInt(req.query.amount);
+                    if(balance_sheet.balance < amount) {
                         return res.status(200).json({ 
+                            message: 'current balance to low for specified withdrawal',
                             balance: balance_sheet.balance,
                             token:  req.token
                         });
                     }
-                    else if(req.query.action === 'close') {
-                        return res.status(200).json({ 
-                            massage: 'what is this path for??',
-                            token:  req.token
-                        });
+                    else 
+                    {
+                        balance_sheet.balance -= parseInt(req.query.amount);
+                        balance_sheet
+                            .save()
+                            .then(result => {
+                                res.status(200).json({ 
+                                    balance: result.balance,
+                                    token:  req.token 
+                                });
+                            })
                     }
-                } catch (err) {
-                    console.log(err);
+                }
+                else if(req.query.action === 'balance') {
                     return res.status(200).json({ 
-                        massage: 'what are you doing!'
+                        balance: balance_sheet.balance,
+                        token:  req.token
                     });
+                }
+                else if(req.query.action === 'close') {
+                    BalanceSheet
+                        .remove({ _user_id : req.userData.userId })
+                        .exec()
+                        .then(result => {
+                            console.log(result);
+                            CTF_User
+                                .remove({ _id : req.userData.userId })
+                                .then(user_removal_result => {
+                                    res.status(200).json({
+                                        message: 'Account Closed',
+                                    });
+                                })
+                        })
                 }
             }
         })
