@@ -2,17 +2,17 @@ var mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "10df51c44384daa",
-  database: "ctf_users"
-});
+// var con = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "10df51c44384daa",
+//   database: "ctf_users"
+// });
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+// con.connect(function(err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 exports.signup_user = (req, res, next) => {
    /*  
@@ -90,6 +90,13 @@ exports.login_user = (req, res, next) => {
    console.log('assessing login');
    console.log(req.query.user);
    console.log(req.query.pass);
+
+   var connection = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "10df51c44384daa",
+      database: "ctf_exercise_test"
+   });
 
    connection.query('SELECT * FROM ctf_exercise_test.ctf_users WHERE username = ?', req.query.user, 
       function(error, user) {
