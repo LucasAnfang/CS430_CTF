@@ -50,12 +50,6 @@ exports.signup_user = (req, res, next) => {
                                             message: 'User created with balance 0'
                                         });
                                     })
-                                    .catch(err => {
-                                        console.log(err);
-                                        res.status(500).json({ 
-                                            error: err 
-                                        });
-                                    });
                             })
                             .catch(err => {
                                 console.log(err);
