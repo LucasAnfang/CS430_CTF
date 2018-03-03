@@ -1,11 +1,11 @@
 
 -- create the database for the ctf challenge
-create database if not exists ctf_exercise_test;
+create database if not exists ctf_exercise;
 
 -- switch db to the newly created one
 use ctf_exercise_test;
 
-create table ctf_users (
+create table accounts (
     _user_id bigint auto_increment primary key,
     username varchar(60) not null unique,
     pw varchar(255) not null,
