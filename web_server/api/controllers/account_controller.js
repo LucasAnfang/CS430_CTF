@@ -2,26 +2,14 @@ var mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// var con = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "10df51c44384daa",
-//   database: "ctf_exercise"
-// });
-
-// con.connect(function(err) {
-//   if (err) throw err;
-//   console.log("Connected!");
-// });
-
 exports.signup_user = (req, res, next) => {
    /*  
       req.query.user => username
       req.query.pass => pw
    */
-   console.log('assessing registration');
-   console.log(req.query.user);
-   console.log(req.query.pass);
+   // console.log('assessing registration');
+   // console.log(req.query.user);
+   // console.log(req.query.pass);
    
    // connect to the database
    var connection = mysql.createConnection({
@@ -33,15 +21,15 @@ exports.signup_user = (req, res, next) => {
    
    connection.connect(function(err) {
       if (err) throw err;
-      console.log("Connected!");
+      // console.log("Connected!");
    });
 
    // Check if username is in use already
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
       function(error, result) {
-         if(err) {
-            // If error is encountered, log it and tell the user their request could not be processed
-            console.log(err);
+         if(error) {
+            // If erroror is encountered, log it and tell the user their request could not be processed
+            console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
@@ -55,10 +43,10 @@ exports.signup_user = (req, res, next) => {
          }
       });
 
-   bcrypt.hash(req.query.pass, 10, (err, hash) => {
-      if (err) {
+   bcrypt.hash(req.query.pass, 10, (error, hash) => {
+      if (error) {
          return res.status(500).json({
-         error: err
+            error: error
          });
       } else {
 
@@ -71,10 +59,10 @@ exports.signup_user = (req, res, next) => {
          };
 
          connection.query('INSERT INTO ctf_exercise.accounts SET ?', new_user,
-            function(err, results) {
-               if(err) {
+            function(error, results) {
+               if(error) {
                   // If error is encountered, log it and tell the user their request could not be processed
-                  console.log(err);
+                  console.log(error);
                   return res.status(500).json({
                      message: 'Request could not be completed'
                   });
@@ -92,9 +80,9 @@ exports.login_user = (req, res, next) => {
       req.query.user => username
       req.query.pass => pw
    */
-   console.log('assessing login');
-   console.log(req.query.user);
-   console.log(req.query.pass);
+   // console.log('assessing login');
+   // console.log(req.query.user);
+   // console.log(req.query.pass);
 
    var connection = mysql.createConnection({
       host: "localhost",
@@ -103,16 +91,16 @@ exports.login_user = (req, res, next) => {
       database: "ctf_exercise"
    });
 
-   connection.connect(function(err) {
-      if (err) throw err;
-      console.log("Connected!");
+   connection.connect(function(error) {
+      if (error) throw error;
+      // console.log("Connected!");
    });
 
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
       function(error, user) {
-         if(err) {
+         if(error) {
             // If error is encountered, log it and tell the user their request could not be processed
-            console.log(err);
+            console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
@@ -122,8 +110,11 @@ exports.login_user = (req, res, next) => {
                   message: 'Auth failed'
             });
          }
-         bcrypt.compare(req.query.pass, user.password, (err, result) => {
+         // Query returns a list so grab the single object
+         var user = user[0]
+         bcrypt.compare(req.query.pass, user.pw, (err, result) => {
                if (err) {
+                  console.log(err);
                   return res.status(401).json({
                      message: 'Auth failed'
                   });
@@ -147,7 +138,7 @@ exports.login_user = (req, res, next) => {
                }
                // at this point the password must be incorrect
                return res.status(401).json({
-                  message: 'Auth failed'
+                  message: 'iAuth failed'
                });
          });
       });
@@ -170,8 +161,8 @@ exports.manage_assets = (req, res, next) => {
        req.query.amount => amount 
    */
 
-   console.log('assessing asset management request');
-   console.log(req.userData)
+   // console.log('assessing asset management request');
+   // console.log(req.userData)
 
    var connection = mysql.createConnection({
       host: "localhost",
@@ -180,71 +171,68 @@ exports.manage_assets = (req, res, next) => {
       database: "ctf_exercise"
    });
 
-   connection.connect(function(err) {
-      if (err) throw err;
-      console.log("Connected!");
+   connection.connect(function(error) {
+      if (error) throw error;
+      // console.log("Connected!");
    });
    
    connection.query('SELECT balance FROM ctf_exercise.accounts WHERE _user_id = ?', req.userData.userId, 
-      function(error, balance) {
-         if(err) {
+      function(error, result) {
+         var currentBalance = result[0].balance;
+         if(error) {
             // If error is encountered, log it and tell the user their request could not be processed
-            console.log(err);
+            console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
          }
 
-         if (balance === null) {
+         if (currentBalance === undefined) {
             return res.status(401).json({
                   message: 'Request could not be completed'
             });
          }
-
+         
          if(req.query.action === 'deposit') {
-            balance += parseInt(req.query.amount);
-            balance_sheet
-               .save()
-               .then(result => {
-               })
-            connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', req.userData.userId,
+            currentBalance += parseInt(req.query.amount);
+            connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                function(error,result){
-                  if(err) {
+                  if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
-                     console.log(err);
+                     console.log(error);
                      return res.status(500).json({
                         message: 'Request could not be completed'
                      });
                   }
                   return res.status(200).json({ 
-                     balance: result.balance,
+                     balance: currentBalance,
                      token: req.token
                   });
                });
          }
          else if(req.query.action === 'withdraw') {
                var amount = parseInt(req.query.amount);
-               if(balance < amount) {
+               if(currentBalance < amount) {
                   return res.status(200).json({ 
                      message: 'current balance to low for specified withdrawal',
-                     balance: balance,
+                     balance: currentBalance,
                      token:  req.token
                   });
                }
                else 
                {
-                  balance -= parseInt(req.query.amount);
-                  connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', req.userData.userId,
+                  currentBalance -= parseInt(req.query.amount);
+                  connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                      function(error,result){
-                        if(err) {
+                        if(error) {
                            // If error is encountered, log it and tell the user their request could not be processed
-                           console.log(err);
+                           console.log(error);
                            return res.status(500).json({
                               message: 'Request could not be completed'
                            });
                         }
                         return res.status(200).json({ 
-                           balance: result.balance,
+                           balance: currentBalance,
                            token: req.token
                         });
                      });
@@ -252,16 +240,16 @@ exports.manage_assets = (req, res, next) => {
          }
          else if(req.query.action === 'balance') {
                return res.status(200).json({ 
-                  balance: balance,
+                  balance: currentBalance,
                   token: req.token
                });
          }
          else if(req.query.action === 'close') {
             connection.query('DELETE FROM ctf_exercise.accounts WHERE _user_id = ?', req.userData.userId,
                function(error,result){
-                  if(err) {
+                  if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
-                     console.log(err);
+                     console.log(error);
                      return res.status(500).json({
                         message: 'Request could not be completed'
                      });
