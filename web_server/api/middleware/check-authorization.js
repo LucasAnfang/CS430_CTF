@@ -18,58 +18,57 @@ module.exports = (req, res, next) => {
    
       connection.connect(function(error) {
          if (error) throw error;
-         console.log("Connected!");
       });
       
       connection.query('UPDATE ctf_exercise.accounts SET jwt_nonce = jwt_nonce + 1 WHERE _user_id = ? AND jwt_nonce = ?', 
          [req.userData.userId, req.userData.nonce],
-         function(error, result){
+         function(error, update_result){
             if(error) {
                // If error is encountered, log it and tell the user their request could not be processed
-               console.log(error);
-               return res.status(500).json({
-                  message: 'Error encountered: Auth failed'
+               return res.status(401).json({
+                  message: 'Auth failed'
                });
             }
 
             // If no rows changed, the nonce must be out of sync or the username is not used 
-            if (result.changedRows === 0) {
+            if (update_result.changedRows === 0) {
                return res.status(401).json({
-                  message: 'Auth failed, no matching user'
+                  message: 'Auth failed'
                });
             }
-         });
-         connection.query('SELECT * FROM ctf_exercise.accounts WHERE _user_id = ?', req.userData.userId,
-         function(error, result){
-            if(error) {
-               // If error is encountered, log it and tell the user their request could not be processed
-               console.log(error);
-               return res.status(500).json({
-                  message: 'Error encountered: Auth failed'
+
+            connection.query('SELECT * FROM ctf_exercise.accounts WHERE _user_id = ?', req.userData.userId,
+               function(error, select_result){
+                  if(error) {
+                     // If error is encountered, log it and tell the user their request could not be processed
+                     // console.log(error);
+                     return res.status(401).json({
+                        message: 'Auth failed'
+                     });
+                  }
+
+                  user = select_result[0]
+                  
+                  const new_token = jwt.sign(
+                     {
+                        username: user.username,
+                        userId: user._user_id,
+                        nonce: user.jwt_nonce
+                     }, 
+                     process.env.JWT_KEY,
+                     {
+                        expiresIn: "1h" // This should probably be really low
+                     }
+                  );
+                  req.token = new_token;
+                  const decoded = jwt.verify(new_token, process.env.JWT_KEY);
+                  req.userData = decoded;
+                  next();
                });
-            }
-            console.log(result)
-            user = result[0]
-            
-            const new_token = jwt.sign(
-               {
-                  username: user.username,
-                  userId: user._user_id,
-                  nonce: user.jwt_nonce
-               }, 
-               process.env.JWT_KEY,
-               {
-                  expiresIn: "1h" // This should probably be really low
-               }
-            );
-            req.token = new_token;
-            const decoded = jwt.verify(new_token, process.env.JWT_KEY);
-            req.userData = decoded;
-            next();
          });
    } catch (error) {
       return res.status(401).json({
-         message: 'Auth failed error encountered!'
+         message: 'Auth failed'
       });
    }
 };

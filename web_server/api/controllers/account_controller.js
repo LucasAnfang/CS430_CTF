@@ -29,50 +29,50 @@ exports.signup_user = (req, res, next) => {
       function(error, result) {
          if(error) {
             // If erroror is encountered, log it and tell the user their request could not be processed
-            console.log(error);
+            // console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
-
-            if(result) {
-               // There exists another user with the same username
-               return res.status(409).json({
-                  message: 'Username already in use'
-               });
-            }
          }
-      });
 
-   bcrypt.hash(req.query.pass, 10, (error, hash) => {
-      if (error) {
-         return res.status(500).json({
-            error: error
-         });
-      } else {
-
-         // If the hash did not result in an error try to save the new user
-         const new_user = {
-            username: req.query.user,
-            pw: hash,
-            jwt_nonce: Math.floor(Math.random() * 50) + 10,
-            balance: 0
-         };
-
-         connection.query('INSERT INTO ctf_exercise.accounts SET ?', new_user,
-            function(error, results) {
-               if(error) {
-                  // If error is encountered, log it and tell the user their request could not be processed
-                  console.log(error);
-                  return res.status(500).json({
-                     message: 'Request could not be completed'
-                  });
-               }
-               res.status(201).json({
-                  message: 'User created with balance 0'
-               });
+         if(result.length > 0) {
+            // There exists another user with the same username
+            return res.status(409).json({
+               message: 'Username already in use'
             });
          }
-   });
+
+         bcrypt.hash(req.query.pass, 10, (error, hash) => {
+            if (error) {
+               return res.status(500).json({
+                  error: error
+               });
+            } else {
+      
+               // If the hash did not result in an error try to save the new user
+               const new_user = {
+                  username: req.query.user,
+                  pw: hash,
+                  jwt_nonce: Math.floor(Math.random() * 50) + 10,
+                  balance: 0
+               };
+      
+               connection.query('INSERT INTO ctf_exercise.accounts SET ?', new_user,
+                  function(error, results) {
+                     if(error) {
+                        // If error is encountered, log it and tell the user their request could not be processed
+                        // console.log(error);
+                        return res.status(500).json({
+                           message: 'Request could not be completed'
+                        });
+                     }
+                     res.status(201).json({
+                        message: 'User created with balance 0'
+                     });
+                  });
+               }
+         });
+      });
 }
 
 exports.login_user = (req, res, next) => {
@@ -97,24 +97,24 @@ exports.login_user = (req, res, next) => {
    });
 
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
-      function(error, user) {
+      function(error, users) {
          if(error) {
             // If error is encountered, log it and tell the user their request could not be processed
-            console.log(error);
+            // console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
          }
-         if (user === null) {
+         if (users.length === 0) {
             return res.status(401).json({
                   message: 'Auth failed'
             });
          }
          // Query returns a list so grab the single object
-         var user = user[0]
+         var user = users[0]
          bcrypt.compare(req.query.pass, user.pw, (err, result) => {
                if (err) {
-                  console.log(err);
+                  // console.log(err);
                   return res.status(401).json({
                      message: 'Auth failed'
                   });
@@ -181,7 +181,7 @@ exports.manage_assets = (req, res, next) => {
          var currentBalance = result[0].balance;
          if(error) {
             // If error is encountered, log it and tell the user their request could not be processed
-            console.log(error);
+            // console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
             });
@@ -199,7 +199,7 @@ exports.manage_assets = (req, res, next) => {
                function(error,result){
                   if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
-                     console.log(error);
+                     // console.log(error);
                      return res.status(500).json({
                         message: 'Request could not be completed'
                      });
@@ -226,7 +226,7 @@ exports.manage_assets = (req, res, next) => {
                      function(error,result){
                         if(error) {
                            // If error is encountered, log it and tell the user their request could not be processed
-                           console.log(error);
+                           // console.log(error);
                            return res.status(500).json({
                               message: 'Request could not be completed'
                            });
@@ -249,7 +249,7 @@ exports.manage_assets = (req, res, next) => {
                function(error,result){
                   if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
-                     console.log(error);
+                     // console.log(error);
                      return res.status(500).json({
                         message: 'Request could not be completed'
                      });

@@ -18,6 +18,8 @@ Download Postman to test the various routes. Some routes have check auth flag on
 
 ## Current Tasks
 + Either figure out how to locally host the mongo database or switch database to mysql and refactor.  
+   + Need to fix updating balance even when auth fails
+   + Lock down all race cases surrounding the nonce
 + Wrap the token inside a cookie
 
 ## Current Security Features
