@@ -7,10 +7,7 @@ exports.signup_user = (req, res, next) => {
       req.query.user => username
       req.query.pass => pw
    */
-   // console.log('assessing registration');
-   // console.log(req.query.user);
-   // console.log(req.query.pass);
-   
+
    // connect to the database
    var connection = mysql.createConnection({
       host: "localhost",
@@ -21,14 +18,13 @@ exports.signup_user = (req, res, next) => {
    
    connection.connect(function(err) {
       if (err) throw err;
-      // console.log("Connected!");
    });
 
    // Check if username is in use already
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
       function(error, result) {
          if(error) {
-            // If erroror is encountered, log it and tell the user their request could not be processed
+            // If error is encountered, log it and tell the user their request could not be processed
             // console.log(error);
             return res.status(500).json({
                message: 'Request could not be completed'
@@ -80,9 +76,6 @@ exports.login_user = (req, res, next) => {
       req.query.user => username
       req.query.pass => pw
    */
-   // console.log('assessing login');
-   // console.log(req.query.user);
-   // console.log(req.query.pass);
 
    var connection = mysql.createConnection({
       host: "localhost",
@@ -93,7 +86,6 @@ exports.login_user = (req, res, next) => {
 
    connection.connect(function(error) {
       if (error) throw error;
-      // console.log("Connected!");
    });
 
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
@@ -138,7 +130,7 @@ exports.login_user = (req, res, next) => {
                }
                // at this point the password must be incorrect
                return res.status(401).json({
-                  message: 'iAuth failed'
+                  message: 'Auth failed'
                });
          });
       });
@@ -161,9 +153,6 @@ exports.manage_assets = (req, res, next) => {
        req.query.amount => amount 
    */
 
-   // console.log('assessing asset management request');
-   // console.log(req.userData)
-
    var connection = mysql.createConnection({
       host: "localhost",
       user: "root",
@@ -183,13 +172,15 @@ exports.manage_assets = (req, res, next) => {
             // If error is encountered, log it and tell the user their request could not be processed
             // console.log(error);
             return res.status(500).json({
-               message: 'Request could not be completed'
+               message: 'Request could not be completed',
+               token: req.token
             });
          }
 
          if (currentBalance === undefined) {
             return res.status(401).json({
-                  message: 'Request could not be completed'
+                  message: 'Request could not be completed',
+                  token: req.token
             });
          }
          
@@ -201,7 +192,8 @@ exports.manage_assets = (req, res, next) => {
                      // If error is encountered, log it and tell the user their request could not be processed
                      // console.log(error);
                      return res.status(500).json({
-                        message: 'Request could not be completed'
+                        message: 'Request could not be completed',
+                        token: req.token
                      });
                   }
                   return res.status(200).json({ 
@@ -228,7 +220,8 @@ exports.manage_assets = (req, res, next) => {
                            // If error is encountered, log it and tell the user their request could not be processed
                            // console.log(error);
                            return res.status(500).json({
-                              message: 'Request could not be completed'
+                              message: 'Request could not be completed',
+                              token: req.token
                            });
                         }
                         return res.status(200).json({ 
@@ -251,13 +244,20 @@ exports.manage_assets = (req, res, next) => {
                      // If error is encountered, log it and tell the user their request could not be processed
                      // console.log(error);
                      return res.status(500).json({
-                        message: 'Request could not be completed'
+                        message: 'Request could not be completed',
+                        token: req.token
                      });
                   }
                   res.status(200).json({
                      message: 'Account Closed',
                   });
                });
+         }
+         else {
+            return res.status(500).json({
+               message: 'Request could not be completed',
+               token: req.token
+            });
          }
       });
 }
