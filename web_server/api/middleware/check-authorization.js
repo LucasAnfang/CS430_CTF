@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 const jwt = require('jsonwebtoken');
+const cookie = require('cookie');
 
 module.exports = (req, res, next) => {
    // Call next if we auth with JWT and error if not (Protect routes to auth users)
