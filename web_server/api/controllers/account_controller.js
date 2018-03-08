@@ -132,7 +132,7 @@ exports.login_user = (req, res, next) => {
                   */
 
                   var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-                  res.cookie('token', token, options);
+                  res.cookie('TKN', token, options);
 
                   return res.status(200).json({
                      message: 'Auth successful'
@@ -182,7 +182,7 @@ exports.manage_assets = (req, res, next) => {
             // If error is encountered, log it and tell the user their request could not be processed
             // console.log(error);
             var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-            res.cookie('token', req.token, options);
+            res.cookie('TKN', req.token, options);
 
             return res.status(500).json({
                message: 'Request could not be completed'
@@ -191,7 +191,7 @@ exports.manage_assets = (req, res, next) => {
 
          if (currentBalance === undefined) {
             var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-            res.cookie('token', req.token, options);
+            res.cookie('TKN', req.token, options);
 
             return res.status(401).json({
                   message: 'Request could not be completed'
@@ -203,7 +203,7 @@ exports.manage_assets = (req, res, next) => {
             connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                function(error,result){
                   var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-                  res.cookie('token', req.token, options);
+                  res.cookie('TKN', req.token, options);
 
                   if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
@@ -221,7 +221,7 @@ exports.manage_assets = (req, res, next) => {
                var amount = parseInt(req.query.amount);
                if(currentBalance < amount) {
                   var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-                  res.cookie('token', req.token, options);
+                  res.cookie('TKN', req.token, options);
 
                   return res.status(200).json({ 
                      message: 'current balance to low for specified withdrawal',
@@ -234,7 +234,7 @@ exports.manage_assets = (req, res, next) => {
                   connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                      function(error,result){
                         var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-                        res.cookie('token', req.token, options);
+                        res.cookie('TKN', req.token, options);
       
                         if(error) {
                            // If error is encountered, log it and tell the user their request could not be processed
@@ -251,7 +251,7 @@ exports.manage_assets = (req, res, next) => {
          }
          else if(req.query.action === 'balance') {
                var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-               res.cookie('token', req.token, options);
+               res.cookie('TKN', req.token, options);
 
                return res.status(200).json({ 
                   balance: currentBalance
@@ -264,7 +264,7 @@ exports.manage_assets = (req, res, next) => {
                      // If error is encountered, log it and tell the user their request could not be processed
                      // console.log(error);
                      var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-                     res.cookie('token', req.token, options);
+                     res.cookie('TKN', req.token, options);
 
                      return res.status(500).json({
                         message: 'Request could not be completed'
@@ -277,7 +277,7 @@ exports.manage_assets = (req, res, next) => {
          }
          else {
             var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
-            res.cookie('token', req.token, options);
+            res.cookie('TKN', req.token, options);
 
             return res.status(500).json({
                message: 'Request could not be completed'
