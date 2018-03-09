@@ -120,7 +120,7 @@ exports.login_user = (req, res, next) => {
                         userId: user._user_id,
                         nonce: user.jwt_nonce
                      }, 
-                     process.env.JWT_KEY,
+                     'secret',
                      {
                         expiresIn: "1h" // This should probably be really low
                      }

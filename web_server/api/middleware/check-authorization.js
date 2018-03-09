@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
       // const token = req.headers.authorization.split(' ')[1]; This was where we were just using bearer tokens
       //console.log(req);
       const token = req.cookies['TKN'];
-      const decoded = jwt.verify(token, process.env.JWT_KEY);
+      const decoded = jwt.verify(token, 'secret');
       req.userData = decoded;
 
       var connection = mysql.createConnection({
@@ -58,13 +58,13 @@ module.exports = (req, res, next) => {
                         userId: user._user_id,
                         nonce: user.jwt_nonce
                      }, 
-                     process.env.JWT_KEY,
+                     'secret',
                      {
                         expiresIn: "1h" // This should probably be really low
                      }
                   );
                   req.token = new_token;
-                  const decoded = jwt.verify(new_token, process.env.JWT_KEY);
+                  const decoded = jwt.verify(new_token, 'secret');
                   req.userData = decoded;
                   next();
                });
