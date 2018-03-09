@@ -11,7 +11,7 @@ var sslOptions = {
     cert: fs.readFileSync('cert.pem'),
     passphrase: 'e77e3fb5'
 };
-const server = https.createServer(sslOptions, app);
-// const server = https.createServer(app);
+// const server = http.createServer(app);
+const server = https.createServer(sslOptions,app);
 
 server.listen(port);

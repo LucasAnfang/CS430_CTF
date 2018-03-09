@@ -7,7 +7,8 @@ module.exports = (req, res, next) => {
    // If there is no token or it is invalid error is auth failed thrown 
    try { 
       // const token = req.headers.authorization.split(' ')[1]; This was where we were just using bearer tokens
-      const token = req.signedCookies['TKN'];
+      //console.log(req);
+      const token = req.cookies['TKN'];
       const decoded = jwt.verify(token, process.env.JWT_KEY);
       req.userData = decoded;
 
@@ -43,7 +44,7 @@ module.exports = (req, res, next) => {
                function(error, select_result){
                   if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
-                     // console.log(error);
+                     console.log(error);
                      return res.status(401).json({
                         message: 'Auth failed'
                      });

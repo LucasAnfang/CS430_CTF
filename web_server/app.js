@@ -5,11 +5,12 @@ const bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser')
 
 const checkAuthorization = require('./api/middleware/check-authorization');
+const ez_auth = require('./api/middleware/easy-auth');
 const AccountController = require('./api/controllers/account_controller');
 
 const app = express();
 app.use(morgan('dev'));
-app.use(cookieParser('secret'));
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

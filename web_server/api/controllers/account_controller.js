@@ -88,6 +88,8 @@ exports.login_user = (req, res, next) => {
       if (error) throw error;
    });
 
+   // console.log(req.query.user);
+   // console.log(req.query.pass);
    connection.query('SELECT * FROM ctf_exercise.accounts WHERE username = ?', req.query.user, 
       function(error, users) {
          if(error) {
@@ -131,7 +133,7 @@ exports.login_user = (req, res, next) => {
                      signed: Indicates if the cookie should be signed
                   */
 
-                  var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+                  var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                   res.cookie('TKN', token, options);
 
                   return res.status(200).json({
@@ -181,7 +183,7 @@ exports.manage_assets = (req, res, next) => {
          if(error) {
             // If error is encountered, log it and tell the user their request could not be processed
             // console.log(error);
-            var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+            var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
             res.cookie('TKN', req.token, options);
 
             return res.status(500).json({
@@ -190,7 +192,7 @@ exports.manage_assets = (req, res, next) => {
          }
 
          if (currentBalance === undefined) {
-            var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+            var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
             res.cookie('TKN', req.token, options);
 
             return res.status(401).json({
@@ -202,7 +204,7 @@ exports.manage_assets = (req, res, next) => {
             currentBalance += parseInt(req.query.amount);
             connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                function(error,result){
-                  var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+                  var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                   res.cookie('TKN', req.token, options);
 
                   if(error) {
@@ -220,7 +222,7 @@ exports.manage_assets = (req, res, next) => {
          else if(req.query.action === 'withdraw') {
                var amount = parseInt(req.query.amount);
                if(currentBalance < amount) {
-                  var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+                  var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                   res.cookie('TKN', req.token, options);
 
                   return res.status(200).json({ 
@@ -233,7 +235,7 @@ exports.manage_assets = (req, res, next) => {
                   currentBalance -= parseInt(req.query.amount);
                   connection.query('UPDATE ctf_exercise.accounts SET balance = ? WHERE _user_id = ?', [currentBalance, req.userData.userId],
                      function(error,result){
-                        var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+                        var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                         res.cookie('TKN', req.token, options);
       
                         if(error) {
@@ -250,7 +252,7 @@ exports.manage_assets = (req, res, next) => {
                }
          }
          else if(req.query.action === 'balance') {
-               var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+               var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                res.cookie('TKN', req.token, options);
 
                return res.status(200).json({ 
@@ -263,7 +265,7 @@ exports.manage_assets = (req, res, next) => {
                   if(error) {
                      // If error is encountered, log it and tell the user their request could not be processed
                      // console.log(error);
-                     var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+                     var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
                      res.cookie('TKN', req.token, options);
 
                      return res.status(500).json({
@@ -276,7 +278,7 @@ exports.manage_assets = (req, res, next) => {
                });
          }
          else {
-            var options = {  maxAge: 60 * 60 * 2, httpOnly: true, signed: true }
+            var options = {  expires: new Date(Date.now() + 1000 * 60 * 60 * 2) }
             res.cookie('TKN', req.token, options);
 
             return res.status(500).json({

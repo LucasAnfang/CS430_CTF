@@ -1,0 +1,5 @@
+curl -k -c cookie.txt "https://127.0.0.1:3000/login?user=Richard&pass=FamJam"
+curl -k -b cookie.txt -c cookie.txt "https://127.0.0.1:3000/manage?action=balance"
+curl -k -b cookie.txt -c cookie.txt "https://127.0.0.1:3000/manage?action=deposit&amount=10"
+curl -k -b cookie.txt -c cookie.txt "https://127.0.0.1:3000/manage?action=withdraw&amount=1"
+curl -k -b cookie.txt -c cookie.txt "https://127.0.0.1:3000/manage?action=balance"
